@@ -6,17 +6,21 @@
     <div class="deck deckB">
       <Launcher session="b" deck_name="Deck B" deck_color="#FD971F" />
     </div>
+
+    <MidiSettings></MidiSettings>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import Launcher from '@/components/Launcher.vue'
+import MidiSettings from '@/components/MidiSettings.vue'
 
 export default {
   name: 'Home',
   components: {
-    Launcher
+    Launcher,
+    MidiSettings
   },
 
   data () {

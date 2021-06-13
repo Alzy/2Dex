@@ -20,6 +20,7 @@ let store = {};
   store.modules = store.modules || {}
 
   resolveStoreModules(require('..\\store\\ableton.js'), 'ableton.js')
+  resolveStoreModules(require('..\\store\\midi.js'), 'midi.js')
 
   // If the environment supports hot reloading...
 
@@ -28,6 +29,7 @@ let store = {};
     module.hot.accept([
       '..\\store\\ableton.js',
       '..\\store\\index.js',
+      '..\\store\\midi.js',
     ], () => {
       // Update `root.modules` with the latest definitions.
       updateModules()
