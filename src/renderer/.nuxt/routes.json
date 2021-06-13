@@ -1,0 +1,14 @@
+[
+  {
+    "name": "info",
+    "path": "/info",
+    "component": "C:\\\\Users\\\\gonza\\\\Desktop\\\\2dex\\\\src\\\\renderer\\\\pages\\\\info.vue",
+    "chunkName": "pages/info"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "C:\\\\Users\\\\gonza\\\\Desktop\\\\2dex\\\\src\\\\renderer\\\\pages\\\\index.vue",
+    "chunkName": "pages/index"
+  }
+]
