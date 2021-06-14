@@ -1,8 +1,10 @@
 <template>
-  <div id="default-layout">
-    <app-header />
-    <nuxt />
-  </div>
+  <v-app>
+    <div id="default-layout">
+      <app-header />
+      <nuxt />
+    </div>
+  </v-app>
 </template>
 
 <script>
@@ -13,8 +15,9 @@ export default {
 </script>
 
 <style>
-body {
+html, body {
   margin: 0 !important;
+  overflow: hidden;
 }
 #default-layout {
   display: flex;

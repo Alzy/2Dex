@@ -9,3 +9,6 @@ app.on('window-all-closed', function () {
 
 // Load here all startup windows
 require('./mainWindow')
+
+// fixes MIDI not working
+app.allowRendererProcessReuse = false

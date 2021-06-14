@@ -4,7 +4,7 @@
       <v-btn plain dark x-large>
         <v-icon>mdi-view-grid-outline</v-icon>
       </v-btn>
-      <v-btn plain dark x-large>
+      <v-btn plain dark x-large @click="onMidiClick">
         <v-icon>mdi-midi-port</v-icon>
       </v-btn>
       <v-btn plain dark x-large @click="onSyncClick">
@@ -28,6 +28,10 @@ export default {
   methods: {
     ...mapActions('ableton', ['initialize', 'closeOSC']),
 
+    onMidiClick () {
+      this.$store.dispatch('midi/toggleIsOpen')
+    },
+
     onSyncClick () {
       this.initialize()
 
@@ -38,6 +42,7 @@ export default {
         this.$store.dispatch('ableton/getClipMapNames', 'b')
         this.$store.dispatch('ableton/getClipMapColors', 'b')
         this.$store.dispatch('ableton/resetClipStates', 'b')
+        this.$store.dispatch('ableton/getSceneMap')
       }, 125)
     }
   }

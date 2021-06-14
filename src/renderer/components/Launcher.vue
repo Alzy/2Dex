@@ -1,7 +1,7 @@
 <template>
   <div class="launcher-container" :scroll-lock="scroll_lock">
     <div class="toolbar">
-      <h1 class="deck_name" :style="deck_color_style" @click="test">{{ deck_name }}</h1>
+      <h1 class="deck_name" :style="deck_color_style">{{ deck_name }}</h1>
       <select v-model="songSelected" class="song_selection" @change="onSongSelectionChange">
         <option selected value="0">Jump to: </option>
         <option v-for="scene in sceneMap" :key="scene.index" :value="scene.index">{{ scene.name }}</option>
@@ -111,6 +111,10 @@ export default {
       'deckBClipMap'
     ]),
 
+    deck () {
+      const deck = String(this.session).toUpperCase()
+      return `deck${deck}`
+    },
     trackStatus () {
       const deck = String(this.session).toUpperCase()
       if (deck === 'B') return this.deckBTrackStatus
@@ -125,6 +129,9 @@ export default {
       const deck = String(this.session).toUpperCase()
       if (deck === 'B') return this.deckBClipMap
       return this.deckAClipMap
+    },
+    deckOffset () {
+      return this.$store.state.ableton[`${this.deck}SceneOffset`]
     },
     isLoaded () {
       if (typeof this.clips === 'undefined') return false
@@ -204,17 +211,16 @@ export default {
           this.$refs.launcher.getBoundingClientRect().top
         )
         if (distanceFromTop > 0 && distanceFromTop < 50) {
-          const scene = parseInt(elem.getAttribute('index')) / 4
+          const scene = Math.floor(parseInt(elem.getAttribute('index')) / 4)
           if (sceneIndexMap.includes(scene)) {
             this.songSelected = scene
-            break
           }
+          if (scene !== this.deckOffset) {
+            this.$store.dispatch('ableton/setDeckSceneOffset', [this.session, scene])
+          }
+          break
         }
       }
-    },
-
-    test () {
-      this.$store.dispatch('ableton/getSceneMap')
     }
   }
 }

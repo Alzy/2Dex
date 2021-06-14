@@ -1,8 +1,8 @@
 import BrowserWinHandler from './BrowserWinHandler'
 
 const winHandler = new BrowserWinHandler({
-  height: 600,
-  width: 1000
+  height: 1080,
+  width: 1080
 })
 
 winHandler.onCreated(_browserWindow => {

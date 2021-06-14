@@ -7,7 +7,7 @@
       <Launcher session="b" deck_name="Deck B" deck_color="#FD971F" />
     </div>
 
-    <MidiSettings></MidiSettings>
+    <MidiSettings />
   </div>
 </template>
 
@@ -27,22 +27,23 @@ export default {
     return {
       osc: null
     }
-  },
+  }
 }
 </script>
 
 <style scoped lang="scss">
 .home {
-    display: flex;
-    max-height: 100vh;
-    overflow: hidden;
+  display: flex;
+  max-height: 100vh;
+  overflow: hidden;
+  flex-grow: 1;
 
-    .deck {
-        display: flex;
-        flex-grow: 1;
-        padding: 0 1em;
-        background-color: #181915;
-        flex-basis: 50%;
-    }
+  .deck {
+    display: flex;
+    flex-grow: 1;
+    padding: 0 1em;
+    background-color: #181915;
+    flex-basis: 50%;
+  }
 }
 </style>

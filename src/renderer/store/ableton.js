@@ -9,10 +9,12 @@ export const state = () => ({
   deckAClipMap: [],
   deckATrackStatus: ['active', 'active', 'active', 'active'],
   deckATrackState: ['idle', 'idle', 'idle', 'idle'],
+  deckASceneOffset: 0,
 
   deckBClipMap: [],
   deckBTrackStatus: ['active', 'active', 'active', 'active'],
-  deckBTrackState: ['idle', 'idle', 'idle', 'idle']
+  deckBTrackState: ['idle', 'idle', 'idle', 'idle'],
+  deckBSceneOffset: 0,
 })
 
 export const mutations = {
@@ -63,9 +65,12 @@ export const mutations = {
     _osc.on(event, callback)
   },
 
-  /// //////////////////
+  /////////////////////
   // SCENE MUTATIONS //
-  /// //////////////////
+  /////////////////////
+  setDeckSceneOffset (state, [deck, offset]) {
+    state[`deck${String(deck).toUpperCase()}SceneOffset`] = offset
+  },
   setSceneMap (state, sceneMap) {
     state.sceneMap = sceneMap
   },
@@ -170,12 +175,14 @@ export const actions = {
     //     console.log('message received:')
     //     console.log(message)
     // })
-
-    context.dispatch('getSceneMap')
   },
 
   closeOSC (context) {
     context.commit('closeOSC')
+  },
+
+  setDeckSceneOffset (context, [deck, offset]) {
+    context.commit('setDeckSceneOffset', [deck, offset])
   },
 
   /// ////////////////////
