@@ -161,7 +161,7 @@ export const actions = {
       const scenes = message.args
       const sceneMap = []
       scenes.forEach((name, index) => {
-        if (isNaN(name) || name.length > 1) {
+        if (isNaN(name) && name.length > 1) {
           sceneMap.push({
             name,
             index
