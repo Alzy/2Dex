@@ -17,6 +17,7 @@
           :style="clip.color"
           :state="clip.state"
           :reference="'clip'+clip.index"
+          :empty="!clip.name.length"
           @click="onClipBtnClick(clip.index, $event)"
           @touchstart="onClipBtnTouchStart(clip.index)"
           @touchend="onClipBtnClick(clip.index, $event)"
@@ -241,6 +242,7 @@ export default {
     .deck_name {
       flex-grow: 1;
       text-align: left;
+      margin-left: 0.15em;
     }
 
     .song_selection {
@@ -275,6 +277,13 @@ export default {
 
     &:focus {
       outline: none;
+    }
+
+    &[empty="true"] {
+      border-color: grey !important;
+      border-width: medium;
+      border-style: groove;
+      opacity: 0.5;
     }
   }
 
