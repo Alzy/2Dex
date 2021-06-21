@@ -1,27 +1,30 @@
 <template>
   <div class="deck-midi-config-wrapper">
     <h1>
-      Deck {{String(session).toUpperCase()}} Config
+      Deck {{ String(session).toUpperCase() }} Config
     </h1>
     <section>
       <h3>Select MIDI device for this deck:</h3>
-      <v-radio-group v-model="midiDevice" @change="openPort(midiDevice)">
+      <v-radio-group v-model="midiDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiDeviceRadioChange">
         <v-radio
           v-for="device in midiDevices"
           :key="device.port"
           :label="device.name"
           :value="device.port"
           :disabled="mappingButtons"
-        ></v-radio>
+        />
       </v-radio-group>
+      <v-btn v-if="midiDevice !== null" @click="onResetButtonClick">Reset</v-btn>
+
+      <v-checkbox v-if="session==='b'" v-model="useSingleMidiController" label="Use same controller as deck A" @change="updateUseSingleMidiController" />
     </section>
 
     <section>
       <h3>Grid Buttons:</h3>
-      <v-btn :loading="mappingButtons" @click="onButtonMapClick" color="primary">Map buttons</v-btn>
+      <v-btn :loading="mappingButtons" color="primary" @click="onButtonMapClick">Map buttons</v-btn>
       <div class="midi-button-grid">
         <div v-for="btn in buttonMap" class="grid-button">
-          <span v-if="btn">{{btn}}</span>
+          <span v-if="btn">{{ btn }}</span>
           <span v-else>_</span>
         </div>
       </div>
@@ -29,10 +32,10 @@
 
     <section>
       <h3>Stop Buttons:</h3>
-      <v-btn :loading="mappingButtons" @click="onButtonMapClick" color="primary">Map buttons</v-btn>
-            <div class="midi-button-grid">
+      <v-btn :loading="mappingButtons" color="primary" @click="onButtonMapClick">Map buttons</v-btn>
+      <div class="midi-button-grid">
         <div v-for="btn in stopButtonMap" class="grid-button">
-          <span v-if="btn">{{btn}}</span>
+          <span v-if="btn">{{ btn }}</span>
           <span v-else>_</span>
         </div>
       </div>
@@ -51,7 +54,8 @@ export default {
   data () {
     return {
       midiDevice: null,
-      mappingButtons: false
+      mappingButtons: false,
+      useSingleMidiController: true
     }
   },
 
@@ -78,24 +82,35 @@ export default {
   },
 
   beforeDestroy () {
-    this.closePort(this.midiDevice)
+    this.closePort([this.session, this.midiDevice])
   },
 
   methods: {
-    ...mapActions('midi', ['openPort', 'closePort']),
+    ...mapActions('midi', ['openPort', 'closePort', 'updateUseSingleMidiController']),
 
     onButtonMapClick () {
       this.mappingButtons = true
-    }
+    },
 
+    onMidiDeviceRadioChange () {
+      this.openPort([this.session, this.midiDevice])
+    },
+
+    onResetButtonClick () {
+      this.closePort([this.session, this.midiDevice])
+      this.midiDevice = null
+    },
+
+    onSingleMidiControllerChange () {
+      this.updateUseSingleMidiController(this.useSingleMidiController)
+    }
   },
 
   props: {
-    session: {type: String, default: 'a'}
+    session: { type: String, default: 'a' }
   }
 }
 </script>
-
 
 <style>
 .deck-midi-config-wrapper {

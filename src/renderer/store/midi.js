@@ -1,12 +1,12 @@
-/////////////////////////
+/// //////////////////////
 // MIDI LIBRARY CONFIG //
-/////////////////////////
+/// //////////////////////
 const STATUS_NOTE_ON = 144
 const STATUS_NOTE_OFF = 128
 
 const midi = require('midi')
-let input = new midi.Input()
-
+const input = new midi.Input()
+const input2 = new midi.Input()
 
 function triggerIfInButtonMap (session, note) {
   const deck = `deck${String(session).toUpperCase()}`
@@ -31,26 +31,39 @@ input.on('message', (deltaTime, message) => {
   //   [status, data1, data2]
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
   // information interpreting the messages.
-  let [status, data1, data2] = message
-  // console.log(status, data1, data2);
-  if (status === STATUS_NOTE_ON) {
+  const [status, data1, data2] = message
+  console.log(status, data1, data2)
+  if (status >= 144 && status <= 159) {
     // data1 => note # , data2 => velocity
     triggerIfInButtonMap('a', data1)
-    triggerIfInButtonMap('b', data1)
     triggerIfInStopButtonMap('a', data1)
+
+    if ($nuxt.$store.state.midi.useSingleMidiController) {
+      triggerIfInButtonMap('b', data1)
+      triggerIfInStopButtonMap('b', data1)
+    }
+  }
+})
+
+input2.on('message', (deltaTime, message) => {
+  const [status, data1, data2] = message
+  console.log(status, data1, data2)
+  if (status >= 144 && status <= 159) {
+    // data1 => note # , data2 => velocity
+    triggerIfInButtonMap('b', data1)
     triggerIfInStopButtonMap('b', data1)
   }
 })
 
-///////////
+/// ////////
 // STORE //
-///////////
+/// ////////
 export const state = () => ({
   isOpen: true,
   midiDevices: [],
-  openPorts: [],
+  useSingleMidiController: true,
 
-  deckAMidiDevice: null,
+  deckAPort: null,
   deckAButtonMap: [
     76, 77, 78, 79,
     72, 73, 74, 75,
@@ -58,19 +71,19 @@ export const state = () => ({
     64, 65, 66, 67
   ],
   deckAStopButtonMap: [
-    60, 61, 62, 63,
+    60, 61, 62, 63
   ],
 
-  deckBMidiDevice: null,
+  deckBPort: null,
   deckBButtonMap: [
-    null, null, null, null,
-    null, null, null, null,
-    null, null, null, null,
-    null, null, null, null
+    48, 49, 50, 51,
+    44, 45, 46, 47,
+    40, 41, 42, 43,
+    36, 37, 38, 39
   ],
   deckBStopButtonMap: [
-    null, null, null, null
-  ],
+    32, 33, 34, 35
+  ]
 })
 
 export const mutations = {
@@ -82,20 +95,16 @@ export const mutations = {
     state.midiDevices = devices
   },
 
-  setOpenPort (state, port) {
-    let _openPorts = state.openPorts
-    if(state.openPorts.indexOf(port) === -1) {
-      _openPorts.push(port)
-    }
-    state.openPorts = _openPorts
+  setUseSingleMidiController (state, value) {
+    state.useSingleMidiController = value
   },
 
-  closeOpenPort (state, port) {
-    let _openPorts = state.openPorts
-    if(state.openPorts.indexOf(port) > -1) {
-      _openPorts.splice(port, 1)
-    }
-    state.openPorts = _openPorts
+  setOpenPort (state, [deck, port]) {
+    state[`deck${String(deck).toUpperCase()}Port`] = port
+  },
+
+  closeOpenPort (state, deck) {
+    state[`deck${String(deck).toUpperCase()}Port`] = null
   }
 }
 
@@ -106,7 +115,7 @@ export const actions = {
 
   getMidiDevices (context) {
     const pCount = input.getPortCount()
-    let devices = []
+    const devices = []
     for (let i = 0; i < pCount; i++) {
       devices.push({
         port: i,
@@ -116,16 +125,30 @@ export const actions = {
     context.commit('setMidiDevices', devices)
   },
 
-  openPort (context, number) {
-    console.log('port opened:', number)
-    input.openPort(number)
-    context.commit('setOpenPort', number)
+  updateUseSingleMidiController (context, value) {
+    context.commit('setUseSingleMidiController', value)
   },
 
-  closePort (context, number) {
-    console.log('port closed:', number)
-    input.closePort(number)
-    context.commit('closeOpenPort', number)
+  openPort (context, [deck, number]) {
+    const _deck = String(deck).toUpperCase()
+    if (_deck === 'A') {
+      input.openPort(number)
+    } else {
+      input2.openPort(number)
+    }
+    context.commit('setOpenPort', [deck, number])
+    console.log(`(Deck${_deck}) port opened:`, number)
+  },
+
+  closePort (context, [deck, number]) {
+    const _deck = String(deck).toUpperCase()
+    if (_deck === 'A') {
+      input.closePort(number)
+    } else {
+      input2.closePort(number)
+    }
+    context.commit('closeOpenPort', deck)
+    console.log(`(Deck${_deck}) port closed:`, number)
   }
 }
 
@@ -137,4 +160,8 @@ export const getters = {
   midiDevices: state => {
     return state.midiDevices
   },
+
+  useSingleMidiController: state => {
+    return state.useSingleMidiController
+  }
 }

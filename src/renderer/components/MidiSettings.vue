@@ -28,10 +28,10 @@
       </v-toolbar>
       <v-card-text class="d-flex">
         <div class="flex-grow-1">
-          <DeckMidiConfig session="a"></DeckMidiConfig>
+          <DeckMidiConfig session="a" />
         </div>
         <div class="flex-grow-1">
-          <DeckMidiConfig session="b"></DeckMidiConfig>
+          <DeckMidiConfig session="b" />
         </div>
       </v-card-text>
       <v-card-actions>

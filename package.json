@@ -10,6 +10,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "electron-build": "node ./.electron-nuxt/build.js --win",
     "lint": "vue-cli-service lint",
     "dev": "node .electron-nuxt/dev.js",
     "lint:fix": "yarn run lint -- --fix",
@@ -23,7 +24,8 @@
     "css-loader": "4.3.x",
     "midi": "^2.0.0",
     "osc-js": "^2.1.2",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@mdi/font": "5.9.55",

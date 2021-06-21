@@ -14,7 +14,7 @@ export const state = () => ({
   deckBClipMap: [],
   deckBTrackStatus: ['active', 'active', 'active', 'active'],
   deckBTrackState: ['idle', 'idle', 'idle', 'idle'],
-  deckBSceneOffset: 0,
+  deckBSceneOffset: 0
 })
 
 export const mutations = {
@@ -65,9 +65,9 @@ export const mutations = {
     _osc.on(event, callback)
   },
 
-  /////////////////////
+  /// //////////////////
   // SCENE MUTATIONS //
-  /////////////////////
+  /// //////////////////
   setDeckSceneOffset (state, [deck, offset]) {
     state[`deck${String(deck).toUpperCase()}SceneOffset`] = offset
   },
