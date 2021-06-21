@@ -4,6 +4,7 @@ let _osc = null
 export const state = () => ({
   osc: null,
 
+  tempo: 0,
   sceneMap: [],
 
   deckAClipMap: [],
@@ -65,6 +66,10 @@ export const mutations = {
     _osc.on(event, callback)
   },
 
+  setTempo (state, tempo) {
+    state.tempo = tempo
+  },
+
   /// //////////////////
   // SCENE MUTATIONS //
   /// //////////////////
@@ -119,6 +124,11 @@ export const actions = {
       }
 
       context.dispatch('setClipState', [deck, clipIndex, state])
+    }])
+
+    context.commit('addOSCListener', ['/live/tempo', message => {
+      let tempo = message.args[0]
+      context.commit('setTempo', tempo)
     }])
 
     context.commit('addOSCListener', ['/live/track/state', message => {
@@ -264,6 +274,10 @@ export const actions = {
 }
 
 export const getters = {
+  tempo: state => {
+    return state.tempo
+  },
+
   sceneMap: state => {
     return state.sceneMap
   },

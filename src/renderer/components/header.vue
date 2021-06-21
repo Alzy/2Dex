@@ -11,11 +11,17 @@
         <v-icon>mdi-table-sync</v-icon>
       </v-btn>
     </nav>
+    <div v-if="tempo > 0" class="d-flex align-center mr-2">
+      <v-chip outlined dark>
+        <v-icon left>mdi-metronome</v-icon>
+        {{tempo}} bpm
+      </v-chip>
+    </div>
   </header>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   mounted () {
@@ -23,6 +29,10 @@ export default {
 
   beforeDestroy () {
     this.closeOSC()
+  },
+
+  computed: {
+    ...mapGetters('ableton', ['tempo'])
   },
 
   methods: {
