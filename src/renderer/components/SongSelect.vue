@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select :value="value" class="scene_selection" @click.prevent.stop="showList = true">
+    <select :value="value" class="scene_selection" @click.prevent.stop="showList = true" v-if="!showList">
       <option selected value="0">Jump to: </option>
       <option v-for="scene in scenes" :key="scene.index" :value="scene.index">{{ scene.name }}</option>
     </select>
