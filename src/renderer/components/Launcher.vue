@@ -2,10 +2,13 @@
   <div class="launcher-container" :scroll-lock="scroll_lock">
     <div class="toolbar">
       <h1 class="deck_name" :style="deck_color_style">{{ deck_name }}</h1>
-      <select v-model="songSelected" class="song_selection" @change="onSongSelectionChange">
-        <option selected value="0">Jump to: </option>
-        <option v-for="scene in sceneMap" :key="scene.index" :value="scene.index">{{ scene.name }}</option>
-      </select>
+      <SongSelect
+        v-model="songSelected"
+        :scenes="sceneMap"
+        class="song_selection"
+        @input="onSongSelectionChange"
+      >
+      </SongSelect>
     </div>
 
     <!-- Clip launch buttons -->
@@ -82,9 +85,13 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import SongSelect from '@/components/SongSelect.vue'
 
 export default {
   name: 'Launcher',
+  components: {
+    SongSelect
+  },
   props: {
     session: { type: String, default: 'a' },
     deck_name: { type: String, default: 'Deck A' },
@@ -230,6 +237,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .launcher-container {
+  position: relative;
   width: 100%;
   max-height: 100%;
   flex-grow: 1;
@@ -243,20 +251,6 @@ export default {
       flex-grow: 1;
       text-align: left;
       margin-left: 0.15em;
-    }
-
-    .song_selection {
-      flex-grow: 1;
-      background-color: unset;
-      color: white;
-      font-size: 1.25em;
-      padding: 0.5em;
-
-      option {
-        font-size: 96px;
-        background-color: unset;
-        color: black;
-      }
     }
   }
 
