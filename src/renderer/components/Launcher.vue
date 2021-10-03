@@ -5,7 +5,7 @@
       <SongSelect
         v-model="songSelected"
         :scenes="sceneMap"
-        class="song_selection"
+        class="scene_selection"
         @input="onSongSelectionChange"
       >
       </SongSelect>

@@ -14,7 +14,7 @@
     <div v-if="tempo > 0" class="d-flex align-center mr-2">
       <v-chip outlined dark>
         <v-icon left>mdi-metronome</v-icon>
-        {{tempo}} bpm
+        {{tempoFormatted}} bpm
       </v-chip>
     </div>
   </header>
@@ -32,7 +32,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters('ableton', ['tempo'])
+    ...mapGetters('ableton', ['tempo']),
+
+    tempoFormatted () {
+      return isNaN(this.tempo) ? 0 : this.tempo.toFixed(2)
+    }
   },
 
   methods: {

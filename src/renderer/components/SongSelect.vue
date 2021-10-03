@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select :value="value" class="scene_selection" @click.prevent="showList = true">
+    <select :value="value" class="scene_selection" @click.prevent.stop="showList = true">
       <option selected value="0">Jump to: </option>
       <option v-for="scene in scenes" :key="scene.index" :value="scene.index">{{ scene.name }}</option>
     </select>
@@ -12,6 +12,7 @@
         <div class="scene-table-list">
           <div class="scene-table-list-header">
             <div>Name</div>
+            <div>Tempo</div>
           </div>
           <div class="scene-table-list-scenes">
             <div
@@ -20,7 +21,8 @@
               class="scene-table-list-scene"
               @click="onSongSelectionChange(scene.index)"
             >
-              <div>{{scene.name}}</div>
+              <div>{{ getSceneName(scene.name) }}</div>
+              <div>{{ getSceneTempo(scene.name) }}</div>
             </div>
           </div>
         </div>
@@ -48,7 +50,19 @@ export default {
     onSongSelectionChange (index) {
       this.showList = false
       this.$emit('input', index)
-    }
+    },
+
+    getSceneName (name) {
+      const regex = /(\w*)\s\-/gm;
+      let m = regex.exec(name)
+      return m !== null ? m[0].substring(0, m[0].indexOf(" -")) : name
+    },
+
+    getSceneTempo (name) {
+      const regex = /(\d*bpm)/gm
+      let m = regex.exec(name)
+      return m !== null ? m[0] : ''
+    },
   },
 
   props: {
@@ -65,6 +79,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
 
   &.inner {
     padding: 1.5rem;
@@ -79,6 +94,11 @@ export default {
 
     .scene-table-list-header {
       border-bottom: 1px solid white;
+      display: flex;
+
+      & > div {
+        flex-grow: 1;
+      }
     }
 
     .scene-table-list-scenes {
@@ -88,6 +108,11 @@ export default {
       .scene-table-list-scene  {
         cursor: pointer;
         padding: 1rem 0rem;
+        display: flex;
+
+        & > div {
+          flex-grow: 1;
+        }
 
         &:hover {
           background-color: rgba(255, 255, 255, 0.25);
@@ -110,6 +135,8 @@ export default {
   color: white;
   font-size: 1em;
   padding: 0.5em;
+  outline: none !important;
+  border: none !important;
 
   option {
     display: none;
@@ -118,6 +145,11 @@ export default {
   .v-overlay__content {
     height: 100%;
     width: 100%;
+  }
+
+  &:focus {
+    outline: none !important;
+    border: none !important;
   }
 }
 </style>
