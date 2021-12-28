@@ -58,7 +58,8 @@ export default {
   computed: {
     ...mapGetters('midi', [
       'isOpen',
-      'midiDevices'
+      'midiDevices',
+      'midiOutDevices',
     ])
   },
 

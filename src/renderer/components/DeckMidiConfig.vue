@@ -14,6 +14,15 @@
           :disabled="mappingButtons"
         />
       </v-radio-group>
+      <v-radio-group v-model="midiOutDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiOutDeviceRadioChange">
+        <v-radio
+          v-for="device in midiOutDevices"
+          :key="device.port"
+          :label="device.name"
+          :value="device.port"
+          :disabled="mappingButtons"
+        />
+      </v-radio-group>
       <v-btn v-if="midiDevice !== null" @click="onResetButtonClick">Reset</v-btn>
 
       <v-checkbox v-if="session==='b'" v-model="useSingleMidiController" label="Use same controller as deck A" @change="updateUseSingleMidiController" />
@@ -54,6 +63,7 @@ export default {
   data () {
     return {
       midiDevice: null,
+      midiOutDevice: null,
       mappingButtons: false,
       useSingleMidiController: true
     }
@@ -61,7 +71,8 @@ export default {
 
   computed: {
     ...mapGetters('midi', [
-      'midiDevices'
+      'midiDevices',
+      'midiOutDevices'
     ]),
 
     deck () {
@@ -86,7 +97,13 @@ export default {
   },
 
   methods: {
-    ...mapActions('midi', ['openPort', 'closePort', 'updateUseSingleMidiController']),
+    ...mapActions('midi', [
+      'openPort',
+      'openOutPort',
+      'closePort',
+      'closeOutPort',
+      'updateUseSingleMidiController'
+    ]),
 
     onButtonMapClick () {
       this.mappingButtons = true
@@ -96,9 +113,17 @@ export default {
       this.openPort([this.session, this.midiDevice])
     },
 
+    onMidiOutDeviceRadioChange () {
+      this.openOutPort([this.session, this.midiOutDevice])
+    },
+
     onResetButtonClick () {
       this.closePort([this.session, this.midiDevice])
+      if (this.midiOutDevice)
+        this.closeOutPort([this.session, this.midiOutDevice])
+
       this.midiDevice = null
+      this.midiOutDevice = null
     },
 
     onSingleMidiControllerChange () {

@@ -75,10 +75,10 @@ export default {
 <style lang="scss">
 .scene-table {
   width: 100%;
-  height: 100%;
+  height: 99%;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 9999;
 
   &.inner {
@@ -94,6 +94,7 @@ export default {
 
     .scene-table-list-header {
       border-bottom: 1px solid white;
+      font-size: 1.25rem;
       display: flex;
 
       & > div {

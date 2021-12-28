@@ -291,6 +291,9 @@ export const getters = {
   deckAClipMap: state => {
     return state.deckAClipMap
   },
+  deckASceneOffset: state => {
+    return state.deckASceneOffset
+  },
 
   deckBTrackStatus: state => {
     return state.deckBTrackStatus
@@ -300,6 +303,9 @@ export const getters = {
   },
   deckBClipMap: state => {
     return state.deckBClipMap
+  },
+  deckBSceneOffset: state => {
+    return state.deckBSceneOffset
   }
 }
 

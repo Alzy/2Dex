@@ -151,6 +151,13 @@ export default {
     this.deck_color_style = 'color: ' + this.deck_color + ';'
     this.deck_border_color_style = 'border-color: ' + this.deck_color + ';'
   },
+
+  watch: {
+    isLoaded () {
+      this.updateLedMatrix()
+    }
+  },
+
   methods: {
     onSongSelectionChange () {
       const targetClipIndex = this.songSelected * 4
@@ -225,10 +232,19 @@ export default {
           }
           if (scene !== this.deckOffset) {
             this.$store.dispatch('ableton/setDeckSceneOffset', [this.session, scene])
+            this.updateLedMatrix()
           }
           break
         }
       }
+    },
+
+    updateLedMatrix () {
+      const sliceFrom = this.deckOffset*4; const sliceTo = sliceFrom + 16;
+      const visibleClips = this.clips.slice(sliceFrom, sliceTo)
+      let ledGridMap = visibleClips.map((clip) => { return (!(clip.name === "")) })
+      // send midi message back to controller
+      this.$store.dispatch('midi/sendGridStateMidiMessage', [this.session, ledGridMap])
     }
   }
 }
