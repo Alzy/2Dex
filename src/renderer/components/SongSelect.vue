@@ -1,13 +1,13 @@
 <template>
   <div>
-    <select :value="value" class="scene_selection" @click.prevent.stop="showList = true" v-if="!showList">
+    <select v-if="!showList" :value="value" class="scene_selection" @click.prevent.stop="showList = true">
       <option selected value="0">Jump to: </option>
       <option v-for="scene in scenes" :key="scene.index" :value="scene.index">{{ scene.name }}</option>
     </select>
-    <v-overlay absolute v-if="showList" class="scene-table" @>
+    <v-overlay v-if="showList" absolute class="scene-table" @>
       <div class="scene-table inner">
         <div class="scene-table-header">
-          <v-btn @click="showList = false" color="red">Close</v-btn>
+          <v-btn color="red" @click="showList = false">Close</v-btn>
         </div>
         <div class="scene-table-list">
           <div class="scene-table-list-header">
@@ -35,14 +35,19 @@
 export default {
   name: 'SongSelect',
 
+  props: {
+    value: { type: Number },
+    scenes: { type: Array, required: true, default: () => { return [] } }
+  },
+
   data () {
     return {
       sceneSelected: 0,
       headers: [
-        {text: 'Name', value: 'name'}
+        { text: 'Name', value: 'name' }
       ],
       search: '',
-      showList: false,
+      showList: false
     }
   },
 
@@ -53,21 +58,16 @@ export default {
     },
 
     getSceneName (name) {
-      const regex = /(\w*)\s\-/gm;
-      let m = regex.exec(name)
-      return m !== null ? m[0].substring(0, m[0].indexOf(" -")) : name
+      const regex = /(\w*)\s\-/gm
+      const m = regex.exec(name)
+      return m !== null ? m[0].substring(0, m[0].indexOf(' -')) : name
     },
 
     getSceneTempo (name) {
       const regex = /(\d*bpm)/gm
-      let m = regex.exec(name)
+      const m = regex.exec(name)
       return m !== null ? m[0] : ''
-    },
-  },
-
-  props: {
-    value: { type: Number },
-    scenes: { type: Array, required: true, default: () => {return []} }
+    }
   }
 }
 </script>

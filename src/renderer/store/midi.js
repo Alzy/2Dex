@@ -202,7 +202,6 @@ export const actions = {
     console.log(`(Deck${_deck}) OUTPUT port closed:`, number)
   },
 
-
   /**
    * Will send midi messages back to the midi controller to turn on and off lights in led matrix.
    *
@@ -218,11 +217,11 @@ export const actions = {
    */
   sendGridStateMidiMessage (context, [deck, gridState]) {
     const _deck = String(deck).toUpperCase()
-    let outputDev = ((_deck === 'A') ? output : output2)
+    const outputDev = ((_deck === 'A') ? output : output2)
     gridState.forEach((ledState, index) => {
-      let midiEventType = ledState ? STATUS_NOTE_ON : STATUS_NOTE_OFF
-      let midiNote = context.state[`deck${_deck}ButtonMap`][index]
-      outputDev.sendMessage([midiEventType, midiNote, 127]);
+      const midiEventType = ledState ? STATUS_NOTE_ON : STATUS_NOTE_OFF
+      const midiNote = context.state[`deck${_deck}ButtonMap`][index]
+      outputDev.sendMessage([midiEventType, midiNote, 127])
     })
   }
 }

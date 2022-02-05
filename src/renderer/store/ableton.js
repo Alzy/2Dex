@@ -2,7 +2,7 @@ const OSC = require('osc-js')
 let _osc = null
 
 export const state = () => ({
-  osc: null,
+  oscStatus: false,
 
   tempo: 0,
   sceneMap: [],
@@ -38,21 +38,22 @@ export const mutations = {
       })
     })
 
-    _osc.open()
-
     _osc.on('open', () => {
-      console.log('connection established...status', _osc.status())
+      console.log('connection established...status:', _osc.status())
+      $nuxt.$store.commit('ableton/setOSCStatus', true)
     })
 
     _osc.on('close', () => {
-      console.log('connection was closed')
-      console.log(_osc.status())
+      console.log('connection was closed...status:', _osc.status())
+      $nuxt.$store.commit('ableton/setOSCStatus', false)
     })
 
     _osc.on('error', err => {
       console.log(_osc.status())
       throw new Error('ERROR:', err)
     })
+
+    _osc.open()
   },
 
   closeOSC (state) {
@@ -70,10 +71,15 @@ export const mutations = {
     state.tempo = tempo
   },
 
+  setOSCStatus (state, status) {
+    state.oscStatus = status
+  },
+
   /// //////////////////
   // SCENE MUTATIONS //
   /// //////////////////
   setDeckSceneOffset (state, [deck, offset]) {
+    deck = String(deck).toUpperCase()
     state[`deck${String(deck).toUpperCase()}SceneOffset`] = offset
   },
   setSceneMap (state, sceneMap) {
@@ -84,14 +90,17 @@ export const mutations = {
   // DECK MUTATIONS //
   /// /////////////////
   setDeckClipMap (state, [deck, clipMap]) {
+    deck = String(deck).toUpperCase()
     state['deck' + deck + 'ClipMap'] = clipMap
   },
   setDeckTrackStatus (state, [deck, track, status]) {
+    deck = String(deck).toUpperCase()
     const newTrackStatus = [...state['deck' + deck + 'TrackStatus']]
     newTrackStatus[track] = status
     state['deck' + deck + 'TrackStatus'] = newTrackStatus
   },
   setDeckTrackState (state, [deck, track, trackState]) {
+    deck = String(deck).toUpperCase()
     const newTrackState = [...state['deck' + deck + 'TrackState']]
     newTrackState[track] = trackState
     state['deck' + deck + 'TrackState'] = newTrackState
@@ -127,7 +136,7 @@ export const actions = {
     }])
 
     context.commit('addOSCListener', ['/live/tempo', message => {
-      let tempo = message.args[0]
+      const tempo = message.args[0]
       context.commit('setTempo', tempo)
     }])
 
@@ -180,11 +189,6 @@ export const actions = {
       })
       context.commit('setSceneMap', sceneMap)
     }])
-
-    // osc.on('*', message => {
-    //     console.log('message received:')
-    //     console.log(message)
-    // })
   },
 
   closeOSC (context) {
@@ -274,6 +278,10 @@ export const actions = {
 }
 
 export const getters = {
+  oscStatus: state => {
+    return state.oscStatus
+  },
+
   tempo: state => {
     return state.tempo
   },

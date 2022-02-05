@@ -20,6 +20,7 @@
   },
   "main": "./dist/main/index.js",
   "dependencies": {
+    "@supercharge/fs": "^3.4.0",
     "core-js": "^3.6.5",
     "css-loader": "4.3.x",
     "midi": "^2.0.0",

@@ -15,6 +15,9 @@
 // @ is an alias to /src
 import Launcher from '@/components/Launcher.vue'
 import MidiSettings from '@/components/MidiSettings.vue'
+import { mapMutations, mapGetters } from 'vuex'
+
+const Fs = require('@supercharge/fs')
 
 export default {
   name: 'Home',
@@ -25,7 +28,38 @@ export default {
 
   data () {
     return {
-      osc: null
+      osc: null,
+      dataFolder: '',
+    }
+  },
+
+  computed: {
+    ...mapGetters('ableton', [
+        'sceneMap',
+        'deckAClipMap',
+        'deckBClipMap',
+      ])
+  },
+
+  async mounted() {
+    this.dataFolder = await Fs.homeDir('2dex')
+    await Fs.ensureFile(`${this.dataFolder}/session.cache`)
+    const sessionCache = await Fs.content(`${this.dataFolder}/session.cache`)
+    this.loadSceneCache(sessionCache)
+  },
+
+  methods: {
+    ...mapMutations('ableton', [
+      'setSceneMap',
+      'setDeckClipMap'
+    ]),
+
+    loadSceneCache (sessionCache) {
+      if (sessionCache.length === 0) return
+      let {sceneMap, deckAClipMap, deckBClipMap} = JSON.parse(sessionCache)
+      this.setSceneMap(sceneMap)
+      this.setDeckClipMap(['a', deckAClipMap])
+      this.setDeckClipMap(['b', deckBClipMap])
     }
   }
 }

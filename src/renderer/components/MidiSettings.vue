@@ -44,6 +44,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import DeckMidiConfig from '@/components/DeckMidiConfig.vue'
+const Fs = require('@supercharge/fs')
 
 export default {
   components: {
@@ -52,6 +53,7 @@ export default {
 
   data () {
     return {
+      dataFolder: ''
     }
   },
 
@@ -59,16 +61,28 @@ export default {
     ...mapGetters('midi', [
       'isOpen',
       'midiDevices',
-      'midiOutDevices',
+      'midiOutDevices'
     ])
   },
 
-  mounted () {
+  async mounted () {
     this.getMidiDevices()
+
+    const dataFolder = await Fs.homeDir('2dex')
+    this.dataFolder = dataFolder
+    const exists = await Fs.exists(dataFolder)
   },
 
   methods: {
-    ...mapActions('midi', ['toggleIsOpen', 'getMidiDevices'])
+    ...mapActions('midi', ['toggleIsOpen', 'getMidiDevices']),
+
+    writeMidiSettings (path, data) {
+      try {
+        fs.writeFileSync(path, data, 'utf-8')
+      } catch (e) { alert('Failed to save the file !') }
+    }
+
+
   }
 }
 </script>

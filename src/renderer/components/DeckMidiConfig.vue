@@ -1,33 +1,35 @@
 <template>
   <div class="deck-midi-config-wrapper">
-    <h1>
-      Deck {{ String(session).toUpperCase() }} Config
-    </h1>
-    <section>
-      <h3>Select MIDI device for this deck:</h3>
-      <v-radio-group v-model="midiDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiDeviceRadioChange">
-        <v-radio
-          v-for="device in midiDevices"
-          :key="device.port"
-          :label="device.name"
-          :value="device.port"
-          :disabled="mappingButtons"
-        />
-      </v-radio-group>
-      <v-radio-group v-model="midiOutDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiOutDeviceRadioChange">
-        <v-radio
-          v-for="device in midiOutDevices"
-          :key="device.port"
-          :label="device.name"
-          :value="device.port"
-          :disabled="mappingButtons"
-        />
-      </v-radio-group>
-      <v-btn v-if="midiDevice !== null" @click="onResetButtonClick">Reset</v-btn>
+    <div class="midi-device">
+      <h1>
+        Deck {{ String(session).toUpperCase() }} Config
+      </h1>
+      <section>
+        <h3>Select MIDI device for this deck:</h3>
+        <v-radio-group v-model="midiDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiDeviceRadioChange">
+          <v-radio
+            v-for="device in midiDevices"
+            :key="device.port"
+            :label="device.name"
+            :value="device.port"
+            :disabled="mappingButtons"
+          />
+        </v-radio-group>
+        <h3>Output Device</h3>
+        <v-radio-group v-model="midiOutDevice" :disabled="useSingleMidiController && session === 'b'" @change="onMidiOutDeviceRadioChange">
+          <v-radio
+            v-for="device in midiOutDevices"
+            :key="device.port"
+            :label="device.name"
+            :value="device.port"
+            :disabled="mappingButtons"
+          />
+        </v-radio-group>
+        <v-btn v-if="midiDevice !== null" @click="onResetButtonClick">Reset</v-btn>
 
-      <v-checkbox v-if="session==='b'" v-model="useSingleMidiController" label="Use same controller as deck A" @change="updateUseSingleMidiController" />
-    </section>
-
+        <v-checkbox v-if="session==='b'" v-model="useSingleMidiController" label="Use same controller as deck A" @change="updateUseSingleMidiController" />
+      </section>
+    </div>
     <section>
       <h3>Grid Buttons:</h3>
       <v-btn :loading="mappingButtons" color="primary" @click="onButtonMapClick">Map buttons</v-btn>
@@ -119,8 +121,7 @@ export default {
 
     onResetButtonClick () {
       this.closePort([this.session, this.midiDevice])
-      if (this.midiOutDevice)
-        this.closeOutPort([this.session, this.midiOutDevice])
+      if (this.midiOutDevice) { this.closeOutPort([this.session, this.midiOutDevice]) }
 
       this.midiDevice = null
       this.midiOutDevice = null
@@ -147,6 +148,11 @@ export default {
 }
 .deck-midi-config-wrapper section {
   margin-bottom: 3rem;
+}
+
+.deck-midi-config-wrapper .midi-device {
+  display: flex;
+  flex-direction: column;
 }
 
 .midi-button-grid {

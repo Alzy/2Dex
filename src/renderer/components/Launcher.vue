@@ -7,8 +7,7 @@
         :scenes="sceneMap"
         class="scene_selection"
         @input="onSongSelectionChange"
-      >
-      </SongSelect>
+      />
     </div>
 
     <!-- Clip launch buttons -->
@@ -147,15 +146,15 @@ export default {
     }
   },
 
-  mounted () {
-    this.deck_color_style = 'color: ' + this.deck_color + ';'
-    this.deck_border_color_style = 'border-color: ' + this.deck_color + ';'
-  },
-
   watch: {
     isLoaded () {
       this.updateLedMatrix()
     }
+  },
+
+  mounted () {
+    this.deck_color_style = 'color: ' + this.deck_color + ';'
+    this.deck_border_color_style = 'border-color: ' + this.deck_color + ';'
   },
 
   methods: {
@@ -240,9 +239,9 @@ export default {
     },
 
     updateLedMatrix () {
-      const sliceFrom = this.deckOffset*4; const sliceTo = sliceFrom + 16;
+      const sliceFrom = this.deckOffset * 4; const sliceTo = sliceFrom + 16
       const visibleClips = this.clips.slice(sliceFrom, sliceTo)
-      let ledGridMap = visibleClips.map((clip) => { return (!(clip.name === "")) })
+      const ledGridMap = visibleClips.map(clip => { return (!(clip.name === '')) })
       // send midi message back to controller
       this.$store.dispatch('midi/sendGridStateMidiMessage', [this.session, ledGridMap])
     }

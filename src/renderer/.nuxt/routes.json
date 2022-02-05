@@ -3,12 +3,14 @@
     "name": "info",
     "path": "/info",
     "component": "C:\\\\Users\\\\gonza\\\\Desktop\\\\2dex\\\\src\\\\renderer\\\\pages\\\\info.vue",
-    "chunkName": "pages/info"
+    "chunkName": "pages/info",
+    "_name": "_d4e9575c"
   },
   {
     "name": "index",
     "path": "/",
     "component": "C:\\\\Users\\\\gonza\\\\Desktop\\\\2dex\\\\src\\\\renderer\\\\pages\\\\index.vue",
-    "chunkName": "pages/index"
+    "chunkName": "pages/index",
+    "_name": "_b6174044"
   }
 ]
