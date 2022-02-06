@@ -31,6 +31,15 @@
       </section>
     </div>
     <section>
+      <h2>Midi Controls</h2>
+      <v-select
+        :items="deviceMaps"
+        label="Load from profile"
+        class="device-map-select"
+        outlined
+        @change="onDeviceProfileChange"
+      ></v-select>
+
       <h3>Grid Buttons:</h3>
       <v-btn :loading="mappingButtons" color="primary" @click="onButtonMapClick">Map buttons</v-btn>
       <div class="midi-button-grid">
@@ -56,7 +65,8 @@
 
 <script>
 // @ is an alias to /src
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
+const Fs = require('@supercharge/fs')
 
 export default {
   components: {
@@ -74,7 +84,11 @@ export default {
   computed: {
     ...mapGetters('midi', [
       'midiDevices',
-      'midiOutDevices'
+      'midiOutDevices',
+      'deckAButtonMap',
+      'deckAStopButtonMap',
+      'deckBButtonMap',
+      'deckBStopButtonMap',
     ]),
 
     deck () {
@@ -88,10 +102,18 @@ export default {
 
     stopButtonMap () {
       return this.$store.state.midi[`${this.deck}StopButtonMap`]
+    },
+
+    deviceMaps () {
+      return Object.keys(this.$defaultMidiMaps)
     }
   },
 
-  mounted () {
+  async mounted () {
+    this.dataFolder = await Fs.homeDir('2dex')
+    await Fs.ensureFile(`${this.dataFolder}/midi.cache`)
+    const midiCache = await Fs.content(`${this.dataFolder}/midi.cache`)
+    this.loadMidiCache(midiCache)
   },
 
   beforeDestroy () {
@@ -106,6 +128,52 @@ export default {
       'closeOutPort',
       'updateUseSingleMidiController'
     ]),
+
+    ...mapMutations('midi', [
+      'setDeckButtonMap',
+      'setDeckStopButtonMap',
+    ]),
+
+    loadMidiCache (midiCache) {
+      if (midiCache.length === 0) {
+        this.initMidiCache()
+        return
+      }
+      let {deckAMidiMap, deckBMidiMap} = JSON.parse(midiCache)
+      let deckMidiMap = String(this.session).toUpperCase() === 'A' ? deckAMidiMap : deckBMidiMap
+      this.setDeckButtonMap([this.session, deckMidiMap.deckButtonMap])
+      this.setDeckStopButtonMap([this.session, deckMidiMap.deckStopButtonMap])
+    },
+
+    async initMidiCache () {
+      await Fs.writeFile(`${this.dataFolder}/midi.cache`, JSON.stringify({
+        deckAMidiMap: {
+          ...this.$defaultMidiMaps['2dex']
+        },
+        deckBMidiMap: {
+          ...this.$defaultMidiMaps['Atom']
+        },
+      }))
+    },
+
+    async writeMidiCache () {
+      await Fs.writeFile(`${this.dataFolder}/midi.cache`, JSON.stringify({
+        deckAMidiMap: {
+          deckButtonMap: this.deckAButtonMap,
+          deckStopButtonMap: this.deckAStopButtonMap,
+        },
+        deckBMidiMap: {
+          deckButtonMap: this.deckBButtonMap,
+          deckStopButtonMap: this.deckBStopButtonMap,
+        },
+      }))
+    },
+
+    onDeviceProfileChange (selected) {
+      this.setDeckButtonMap([this.session, this.$defaultMidiMaps[selected].deckButtonMap])
+      this.setDeckStopButtonMap([this.session, this.$defaultMidiMaps[selected].deckStopButtonMap])
+      this.writeMidiCache()
+    },
 
     onButtonMapClick () {
       this.mappingButtons = true
@@ -153,6 +221,10 @@ export default {
 .deck-midi-config-wrapper .midi-device {
   display: flex;
   flex-direction: column;
+}
+
+.device-map-select {
+  max-width: 75%;
 }
 
 .midi-button-grid {

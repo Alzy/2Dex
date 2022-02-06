@@ -15,6 +15,7 @@ import { createStore } from './store.js'
 
 import nuxt_plugin_plugin_4c52af62 from 'nuxt_plugin_plugin_4c52af62' // Source: .\\vuetify\\plugin.js (mode: 'all')
 import nuxt_plugin_icons_2bd3da91 from 'nuxt_plugin_icons_2bd3da91' // Source: ..\\plugins\\icons.js (mode: 'all')
+import nuxt_plugin_defaultMidiMaps_29da2592 from 'nuxt_plugin_defaultMidiMaps_29da2592' // Source: ..\\plugins\\defaultMidiMaps.js (mode: 'all')
 
 // Component: <ClientOnly>
 Vue.component(ClientOnly.name, ClientOnly)
@@ -214,6 +215,10 @@ async function createApp(ssrContext, config = {}) {
 
   if (typeof nuxt_plugin_icons_2bd3da91 === 'function') {
     await nuxt_plugin_icons_2bd3da91(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_defaultMidiMaps_29da2592 === 'function') {
+    await nuxt_plugin_defaultMidiMaps_29da2592(app.context, inject)
   }
 
   // Lock enablePreview in context

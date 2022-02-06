@@ -108,6 +108,14 @@ export const mutations = {
     state.useSingleMidiController = value
   },
 
+  setDeckButtonMap (state, [deck, btnMap]) {
+    state[`deck${String(deck).toUpperCase()}ButtonMap`] = btnMap
+  },
+
+  setDeckStopButtonMap (state, [deck, btnMap]) {
+    state[`deck${String(deck).toUpperCase()}StopButtonMap`] = btnMap
+  },
+
   setOpenPort (state, [deck, port]) {
     state[`deck${String(deck).toUpperCase()}Port`] = port
   },
@@ -227,6 +235,19 @@ export const actions = {
 }
 
 export const getters = {
+  deckAButtonMap: state => {
+    return state.deckAButtonMap
+  },
+  deckAStopButtonMap: state => {
+    return state.deckAStopButtonMap
+  },
+  deckBButtonMap: state => {
+    return state.deckBButtonMap
+  },
+  deckBStopButtonMap: state => {
+    return state.deckBStopButtonMap
+  },
+
   isOpen: state => {
     return state.isOpen
   },
