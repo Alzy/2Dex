@@ -3,6 +3,11 @@
 /// //////////////////////
 const STATUS_NOTE_ON = 144
 const STATUS_NOTE_OFF = 128
+// APC Constants
+// https://www.akaipro.com/amfile/file/download/file/495/product/15
+const APC_ABLETON_MODE = 0x41
+const APC_ABLETON_MODE_ALTERNATIVE = 0x42
+const APC_ABLETON_MODE_PAYLOAD = [0xF0, 0x47, 0x7F, 0x29, 0x60, 0x00, 0x04, 0x41, 0x08, 0x02, 0x01, 0xF7]
 
 const midi = require('midi')
 const input = new midi.Input()
@@ -10,7 +15,11 @@ const output = new midi.Output()
 const input2 = new midi.Input()
 const output2 = new midi.Output()
 
-function triggerIfInButtonMap (session, note) {
+const Apc40MKIIService = require('../services/apc40MKIIService.js')
+const apcService = new Apc40MKIIService.default()
+
+
+function triggerIfInButtonMap (session, note, channel) {
   const deck = `deck${String(session).toUpperCase()}`
   const pos = $nuxt.$store.state.midi[`${deck}ButtonMap`].indexOf(note)
   if (pos >= 0) {
@@ -20,9 +29,12 @@ function triggerIfInButtonMap (session, note) {
   }
 }
 
-function triggerIfInStopButtonMap (session, note) {
+function triggerIfInStopButtonMap (session, note, channel) {
   const deck = `deck${String(session).toUpperCase()}`
-  const index = $nuxt.$store.state.midi[`${deck}StopButtonMap`].indexOf(note)
+  const index = $nuxt.$store.state.midi[`${deck}StopButtonMap`].findIndex(e => {
+    if (typeof e === 'object') return e?.note === note && e?.channel === channel
+    return e === note
+  })
   if (index >= 0) {
     $nuxt.$store.dispatch('ableton/stopTrack', [session, index])
   }
@@ -34,15 +46,16 @@ input.on('message', (deltaTime, message) => {
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
   // information interpreting the messages.
   const [status, data1, data2] = message
-  // console.log(status, data1, data2)
+  console.log(status, data1, data2)
   if (status >= 144 && status <= 159) {
+    const channel = status - 144
     // data1 => note # , data2 => velocity
-    triggerIfInButtonMap('a', data1)
-    triggerIfInStopButtonMap('a', data1)
+    triggerIfInButtonMap('a', data1, channel)
+    triggerIfInStopButtonMap('a', data1, channel)
 
     if ($nuxt.$store.state.midi.useSingleMidiController) {
-      triggerIfInButtonMap('b', data1)
-      triggerIfInStopButtonMap('b', data1)
+      triggerIfInButtonMap('b', data1, channel)
+      triggerIfInStopButtonMap('b', data1, channel)
     }
   }
 })
@@ -51,9 +64,10 @@ input2.on('message', (deltaTime, message) => {
   const [status, data1, data2] = message
   // console.log(status, data1, data2)
   if (status >= 144 && status <= 159) {
+    const channel = status - 144
     // data1 => note # , data2 => velocity
-    triggerIfInButtonMap('b', data1)
-    triggerIfInStopButtonMap('b', data1)
+    triggerIfInButtonMap('b', data1, channel)
+    triggerIfInStopButtonMap('b', data1, channel)
   }
 })
 
@@ -65,6 +79,7 @@ export const state = () => ({
   midiDevices: [],
   midiOutDevices: [],
   useSingleMidiController: true,
+  numGridRows: 5,
 
   deckAPort: null,
   deckAOutPort: null,
@@ -181,6 +196,10 @@ export const actions = {
     const _deck = String(deck).toUpperCase()
     if (_deck === 'A') {
       output.openPort(number)
+      if (output.getPortName(number) === 'APC40 mkII'){
+        output.sendMessage(APC_ABLETON_MODE_PAYLOAD)
+        console.log('APC40 MKII detected. Set Ableton Mode:', APC_ABLETON_MODE_PAYLOAD)
+      }
     } else {
       output2.openPort(number)
     }
@@ -225,11 +244,14 @@ export const actions = {
    */
   sendGridStateMidiMessage (context, [deck, gridState]) {
     const _deck = String(deck).toUpperCase()
-    const outputDev = ((_deck === 'A') ? output : output2)
-    gridState.forEach((ledState, index) => {
-      const midiEventType = ledState ? STATUS_NOTE_ON : STATUS_NOTE_OFF
+    let outputDev = ((_deck === 'A') ? output : output2)
+    if (_deck === 'B' && context.state['useSingleMidiController']) outputDev = output
+
+    // console.log(apcService)
+    gridState.forEach((color, index) => {
+      const colorId = apcService.getNearestColorCode(color)
       const midiNote = context.state[`deck${_deck}ButtonMap`][index]
-      outputDev.sendMessage([midiEventType, midiNote, 127])
+      outputDev.sendMessage([STATUS_NOTE_ON, midiNote, colorId])
     })
   }
 }
@@ -262,5 +284,9 @@ export const getters = {
 
   useSingleMidiController: state => {
     return state.useSingleMidiController
+  },
+
+  numGridRows: state => {
+    return state.numGridRows
   }
 }

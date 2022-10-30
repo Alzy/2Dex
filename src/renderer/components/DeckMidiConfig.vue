@@ -170,8 +170,18 @@ export default {
     },
 
     onDeviceProfileChange (selected) {
-      this.setDeckButtonMap([this.session, this.$defaultMidiMaps[selected].deckButtonMap])
-      this.setDeckStopButtonMap([this.session, this.$defaultMidiMaps[selected].deckStopButtonMap])
+      const selectedButtonMap = this.$defaultMidiMaps[selected]
+      if (selectedButtonMap?.deckAButtonMap && selectedButtonMap?.deckAButtonMap) {
+        this.setDeckButtonMap(['A', selectedButtonMap.deckAButtonMap])
+        this.setDeckButtonMap(['B', selectedButtonMap.deckBButtonMap])
+        this.setDeckStopButtonMap(['A', selectedButtonMap.deckAStopButtonMap])
+        this.setDeckStopButtonMap(['B', selectedButtonMap.deckBStopButtonMap])
+
+      } else {
+        this.setDeckButtonMap([this.session, selectedButtonMap.deckButtonMap])
+        this.setDeckStopButtonMap([this.session, selectedButtonMap.deckStopButtonMap])
+      }
+
       this.writeMidiCache()
     },
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="launcher-container" :scroll-lock="scroll_lock">
+  <div class="launcher-container" :scroll-lock="scroll_lock" :style="`--num-grid-rows: ${numGridRows}`">
     <div class="toolbar">
       <h1 class="deck_name" :style="deck_color_style">{{ deck_name }}</h1>
       <SongSelect
@@ -115,7 +115,10 @@ export default {
       'deckAClipMap',
       'deckBTrackStatus',
       'deckBTrackState',
-      'deckBClipMap'
+      'deckBClipMap',
+    ]),
+    ...mapGetters('midi', [
+      'numGridRows'
     ]),
 
     deck () {
@@ -239,9 +242,13 @@ export default {
     },
 
     updateLedMatrix () {
-      const sliceFrom = this.deckOffset * 4; const sliceTo = sliceFrom + 16
+      const sliceFrom = this.deckOffset * 4; const sliceTo = sliceFrom + (4 * this.numGridRows)
       const visibleClips = this.clips.slice(sliceFrom, sliceTo)
-      const ledGridMap = visibleClips.map(clip => { return (!(clip.name === '')) })
+      const ledGridMap = visibleClips.map(clip => {
+        if (clip.name === '') return "000000"
+        const regex = /#(......)/gm
+        return regex.exec(clip.color)[0]
+      })
       // send midi message back to controller
       this.$store.dispatch('midi/sendGridStateMidiMessage', [this.session, ledGridMap])
     }
@@ -312,7 +319,7 @@ export default {
     .clip {
       display: flex;
       width: 25%;
-      height: 25%;
+      height: calc((1/var(--num-grid-rows)) * 100%);
       flex-grow: 1;
       padding: 0.25rem;
       scroll-snap-align: start;
