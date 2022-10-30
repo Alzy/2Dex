@@ -147,8 +147,10 @@ export const actions = {
 
       if (trackState < 0) {
         trackState = 'idle'
+        $nuxt.$store.dispatch('midi/sendTrackStateMidiMessage', [deck, track, 0])
       } else {
         trackState = 'playing' // any nonzero value number is playing I think...
+        $nuxt.$store.dispatch('midi/sendTrackStateMidiMessage', [deck, track, 1])
       }
 
       context.commit('setDeckTrackState', [deck, track, trackState])

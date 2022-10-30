@@ -206,6 +206,7 @@ export default {
       this.$store.dispatch('ableton/toggleTrack', [this.session, index])
     },
     onStopBtnClick (index) {
+      this.$store.dispatch('midi/sendTrackStateMidiMessage', [this.session, index, 2])
       this.$store.dispatch('ableton/stopTrack', [this.session, index])
     },
 

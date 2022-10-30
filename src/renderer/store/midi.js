@@ -36,6 +36,7 @@ function triggerIfInStopButtonMap (session, note, channel) {
     return e === note
   })
   if (index >= 0) {
+    $nuxt.$store.dispatch('midi/sendTrackStateMidiMessage', [session, index, 2])
     $nuxt.$store.dispatch('ableton/stopTrack', [session, index])
   }
 }
@@ -46,7 +47,7 @@ input.on('message', (deltaTime, message) => {
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
   // information interpreting the messages.
   const [status, data1, data2] = message
-  console.log(status, data1, data2)
+  // console.log(status, data1, data2)
   if (status >= 144 && status <= 159) {
     const channel = status - 144
     // data1 => note # , data2 => velocity
@@ -247,12 +248,27 @@ export const actions = {
     let outputDev = ((_deck === 'A') ? output : output2)
     if (_deck === 'B' && context.state['useSingleMidiController']) outputDev = output
 
-    // console.log(apcService)
     gridState.forEach((color, index) => {
       const colorId = apcService.getNearestColorCode(color)
       const midiNote = context.state[`deck${_deck}ButtonMap`][index]
       outputDev.sendMessage([STATUS_NOTE_ON, midiNote, colorId])
     })
+  },
+
+  /**
+   * Controls LEDs on the clip stop buttons if any.
+   * @param context
+   * @param deck {String} "A" or "B"
+   * @param trackNum {Number} 0-4, track/channel number on deck
+   * @param state {Number} 0: off, 1: on,  2: blink (stopping)
+   */
+  sendTrackStateMidiMessage (context, [deck, trackNum, state]) {
+    const _deck = String(deck).toUpperCase()
+    let outputDev = ((_deck === 'A') ? output : output2)
+    let trackNumCons = ((_deck === 'A') ? trackNum : trackNum + 4)
+    if (_deck === 'B' && context.state['useSingleMidiController']) outputDev = output
+
+    outputDev.sendMessage([STATUS_NOTE_ON + trackNumCons, 0x34, state])
   }
 }
 
