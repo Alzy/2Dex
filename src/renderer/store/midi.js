@@ -197,7 +197,7 @@ export const actions = {
     const _deck = String(deck).toUpperCase()
     if (_deck === 'A') {
       output.openPort(number)
-      if (output.getPortName(number).includes('APC40 mkII')){
+      if (output.getPortName(number).includes('APC40 mkII') || output.getPortName(number).includes('MidiSplit')){
         output.sendMessage(APC_ABLETON_MODE_PAYLOAD)
         console.log('APC40 MKII detected. Set Ableton Mode:', APC_ABLETON_MODE_PAYLOAD)
       }
